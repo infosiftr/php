@@ -81,6 +81,17 @@ RUN set -eux; \
 	chmod 1777 /var/www/html
 
 {{ if env.variant == "apache" then ( -}}
+{{ if is_alpine then ( -}}
+RUN set -eux; \
+	apk add --no-cache apache2; \
+	\
+# adjust DocumentRoot to "/var/www/html" to match all the other "php" image variants
+	grep -E 'DocumentRoot.*/var/www/localhost/htdocs' /etc/apache2/httpd.conf; \
+	grep -E '<Directory.*/var/www/localhost/htdocs' /etc/apache2/httpd.conf; \
+	sed -ri 's!/var/www/localhost/htdocs!/var/www/html!g' /etc/apache2/httpd.conf; \
+	mv -v /var/www/localhost/htdocs /var/www/html; \
+	# TODO ErrorLog to /var/log/apache2/error.log
+{{ ) else ( -}}
 ENV APACHE_CONFDIR /etc/apache2
 ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
 
@@ -114,6 +125,7 @@ RUN set -eux; \
 # allow running as an arbitrary user (https://github.com/docker-library/php/issues/743)
 		chmod 1777 "$dir"; \
 	done; \
+{{ ) end -}}
 	\
 # delete the "index.html" that installing Apache drops in here
 	rm -rvf /var/www/html/*; \
