@@ -125,4 +125,24 @@ for version in "${versions[@]}"; do
 	')"
 done
 
+# get latest version of pie
+pie="$(
+	curl -fsSL -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2026-03-10' 'https://api.github.com/repos/php/pie/releases/latest' \
+	| jq -c '
+		([.assets[] | select(.name == "pie.phar")][0]) as $pie
+		| {
+			pie: {
+				version: .tag_name,
+				url: $pie.browser_download_url,
+				sha256: ($pie.digest | ltrimstr("sha256:")),
+				from: "alpine:3.24"
+			},
+		}
+	'
+)"
+json="$(jq <<<"$json" --argjson pie "$pie" -c '
+	. + $pie
+')"
+
+
 jq <<<"$json" 'to_entries | sort_by(.key) | from_entries' > versions.json

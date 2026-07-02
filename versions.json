@@ -108,5 +108,11 @@
       "alpine3.23/cli",
       "alpine3.23/fpm"
     ]
+  },
+  "pie": {
+    "version": "1.4.7",
+    "url": "https://github.com/php/pie/releases/download/1.4.7/pie.phar",
+    "sha256": "e8d27c100e85720f374a55f79d63fa8d686dedabc9ccbc6567085e0baf646d55",
+    "from": "alpine:3.24"
   }
 }

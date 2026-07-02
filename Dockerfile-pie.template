@@ -1,0 +1,9 @@
+FROM {{ .from }} as build
+RUN set -eux; \
+	apk add --no-cache curl; \
+	curl -fsSL -o /usr/local/bin/pie {{ .url | @sh }}; \
+	echo '{{ .sha256 }} */usr/local/bin/pie' | sha256sum -c; \
+	chmod +x /usr/local/bin/pie
+
+FROM scratch
+COPY --from=build /usr/local/bin/pie /pie

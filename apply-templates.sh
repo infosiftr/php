@@ -37,6 +37,15 @@ for version; do
 		continue
 	fi
 
+	if [ "$version" == 'pie' ]; then
+		mkdir -p 'pie'
+		{
+			generated_warning
+			gawk -f "$jqt" 'Dockerfile-pie.template'
+		} > "pie/Dockerfile"
+		continue
+	fi
+
 	variants="$(jq -r '.[env.version].variants | map(@sh) | join(" ")' versions.json)"
 	eval "variants=( $variants )"
 
